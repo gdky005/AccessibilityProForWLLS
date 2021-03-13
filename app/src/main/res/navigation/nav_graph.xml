@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/FirstFragment"
         android:name="com.xes.teacher.myapplication.FirstFragment"
-        android:label="@string/first_fragment_label"
+        android:label="自动化登录演示"
         tools:layout="@layout/fragment_first">
 
         <action

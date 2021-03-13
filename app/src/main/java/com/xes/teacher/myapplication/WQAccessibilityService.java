@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -40,6 +42,33 @@ public class WQAccessibilityService extends AccessibilityService {
     private static final String TEXTVIEW = TextView.class.getCanonicalName();
     private static final String EDITTEXT = EditText.class.getCanonicalName();
     private static final String LISTVIEW = ListView.class.getCanonicalName();
+    private static final String IMAGEVIEW = ImageView.class.getCanonicalName();
+
+
+    private boolean isClickMine = false;
+    private boolean isPhoneNumber = false;
+    private boolean isPhoneVerifyCode = false;
+    private boolean isCheckImg = false;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        resetData();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        resetData();
+    }
+
+    private void resetData() {
+        isClickMine = false;
+        isPhoneNumber = false;
+        isCheckImg = false;
+    }
 
     Handler handler = new Handler(Looper.getMainLooper()) {
 
@@ -49,16 +78,33 @@ public class WQAccessibilityService extends AccessibilityService {
 
             AccessibilityNodeInfo node = (AccessibilityNodeInfo) msg.obj;
 
+            CharSequence nodeText = node.getText();
+            if (!TextUtils.isEmpty(nodeText)) {
+                String nodeName = node.getText().toString();
+                Log.i(TAG, "handler: handleMessage AccessibilityNodeInfo=" + nodeName);
+
+                if (nodeName.equals("我的")) {
+                    isClickMine = true;
+                }
+            }
+
             switch (msg.what) {
                 case FLAG_MESSAGE_REVIEW_EVENT:
                 case FLAG_MESSAGE_CLICK_EVENT:
                     runPerformAction(node, AccessibilityNodeInfo.ACTION_CLICK);
                     break;
                 case FLAG_MESSAGE_INPUT_EVENT:
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        // TODO: 2016/10/26  可以再次输入内容
-                        runPerformAction(node, AccessibilityNodeInfo.ACTION_SET_TEXT, "可以再次输入内容");
+                    // TODO: 2016/10/26  可以再次输入内容
+                    if (!isPhoneNumber && node.getHintText().toString().equals("请输入手机号")) {
+                        runPerformAction(node, AccessibilityNodeInfo.ACTION_SET_TEXT, "13800100186");
+                        isPhoneNumber = true;
                     }
+
+                    if (!isPhoneVerifyCode  && node.getHintText().toString().equals("请输入验证码")) {
+                        runPerformAction(node, AccessibilityNodeInfo.ACTION_SET_TEXT, "581209");
+                        isPhoneVerifyCode = true;
+                    }
+
                     break;
                 case FLAG_MESSAGE_SCROLL_EVENT:
                     runPerformAction(node, AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
@@ -83,14 +129,25 @@ public class WQAccessibilityService extends AccessibilityService {
         private void runPerformAction(AccessibilityNodeInfo node, int type, String text) {
             if (node != null) {
                 if (AccessibilityNodeInfo.ACTION_SET_TEXT == type) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { // 大于等于 5.0 系统 可以给 设置  文本
-                        Bundle arguments = new Bundle();
-                        arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text);
-                        node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
-                    }
+                    // 大于等于 5.0 系统 可以给 设置  文本
+                    Bundle arguments = new Bundle();
+                    arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text);
+                    node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
                 } else {
-                    node.performAction(type);
+                    if (node.isClickable()) {
+                        node.performAction(type);
+                    } else {
+                        AccessibilityNodeInfo nodeInfo = node.getParent();
+                        if (nodeInfo.isClickable()) {
+                            nodeInfo.performAction(type);
+                        }
+                    }
                 }
+            }
+
+            if (type == AccessibilityNodeInfo.ACTION_CLICK && node.getClassName().toString().contains("ImageView")) {
+                isCheckImg = true;
+
             }
         }
     };
@@ -117,11 +174,45 @@ public class WQAccessibilityService extends AccessibilityService {
 
             // TODO: 2016/10/26  这里处理相关事件
 
-            checkName(TEXTVIEW, "搜索");
+            checkName(BUTTON, "同意并使用");
+            checkName(TEXTVIEW, "直接进入");
 
-            checkName(EDITTEXT, "com.tencent.mm:id/fo");
+            if (!isClickMine) {
+                checkName(TEXTVIEW, "我的");
+            }
 
-            checkName(LISTVIEW, "com.tencent.mm:id/bfr");
+            checkName(TEXTVIEW, "登录/注册");
+
+            if (!isPhoneNumber) {
+                checkName(EDITTEXT, "com.xes.teacher.live:id/et_phone_number");
+//                isPhoneNumber = true;
+            } else {
+                if (!isPhoneVerifyCode) {
+                    checkName(EDITTEXT, "com.xes.teacher.live:id/et_phone_verify_code");
+//                isPhoneVerifyCode = true;
+                }
+            }
+
+            if (!isCheckImg) {
+                checkName(IMAGEVIEW, "com.xes.teacher.live:id/iv_check_select");
+            }
+
+
+
+//            if (!isCheckImg) {
+//
+//
+//                checkName(BUTTON, "登录");
+//            }
+
+            if (isCheckImg) {
+                checkName(BUTTON, "登录");
+            }
+
+
+
+//            checkName(EDITTEXT, "com.tencent.mm:id/fo");
+//            checkName(LISTVIEW, "com.tencent.mm:id/bfr");
         }
     }
 
