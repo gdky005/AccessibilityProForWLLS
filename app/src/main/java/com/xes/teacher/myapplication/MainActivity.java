@@ -1,7 +1,9 @@
 package com.xes.teacher.myapplication;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -47,11 +49,11 @@ public class MainActivity extends AppCompatActivity {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 
-//                ComponentName componentName = new ComponentName("com.android.settings", "com.android.settings.Settings$AccessibilitySettingsActivity");
-////
-//                Intent intent = new Intent();
-//                intent.setComponent(componentName);
-//                startActivity(intent);
+                ComponentName componentName = new ComponentName("com.android.settings", "com.android.settings.Settings$AccessibilitySettingsActivity");
+//
+                Intent intent = new Intent();
+                intent.setComponent(componentName);
+                startActivity(intent);
 
 //                initAccessibilityService();
             }
