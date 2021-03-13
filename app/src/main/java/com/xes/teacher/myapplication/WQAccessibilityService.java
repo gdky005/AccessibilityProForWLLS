@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -40,7 +41,7 @@ public class WQAccessibilityService extends AccessibilityService {
     private static final String EDITTEXT = EditText.class.getCanonicalName();
     private static final String LISTVIEW = ListView.class.getCanonicalName();
 
-    Handler handler = new Handler(getMainLooper()) {
+    Handler handler = new Handler(Looper.getMainLooper()) {
 
         @Override
         public void handleMessage(Message msg) {

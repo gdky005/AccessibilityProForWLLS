@@ -1,11 +1,12 @@
 package com.xes.teacher.myapplication;
 
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +16,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.xes.teacher.myapplication.databinding.ActivityMainBinding;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,36 +51,49 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Toast.makeText(this, "请优先开启 " + getString(R.string.accessibilityTab) + " 的权限", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "请优先开启 " + getString(R.string.accessibilityTab) + " 的权限", Toast.LENGTH_SHORT).show();
 //        startService(new Intent(this, WQAccessibilityService.class));
 
+        Toast.makeText(this, "障碍开关：" + isStartAccessibilityServiceEnable(this), Toast.LENGTH_SHORT).show();
+
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    /**
+     * 判断无障碍服务是否开启
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isStartAccessibilityServiceEnable(Context context) {
+        AccessibilityManager accessibilityManager =
+                (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
+        assert accessibilityManager != null;
+        List<AccessibilityServiceInfo> accessibilityServices =
+                accessibilityManager.getEnabledAccessibilityServiceList(
+                        AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
+        for (AccessibilityServiceInfo info : accessibilityServices) {
+            if (info.getId().contains(context.getPackageName())) {
+                return true;
+            }
         }
-
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
-    }
+//    /**
+//     * 初始化无障碍
+//     */
+//    private void initAccessibilityService() {
+//        RootCmd.execCmd("pm grant camera.app.com.backward android.permission.READ_PHONE_STATE");
+//        boolean b = RootCmd.execCmd("pm grant camera.app.com.backward android.permission.WRITE_SECURE_SETTINGS");
+//        if (b) {
+//            Log.d("system", "WRITE_SECURE_SETTINGS SUCCESS!");
+////                自动开启无障碍服务
+//            if (!ServiceUtils.isStartAccessibilityServiceEnable(this)) {
+//                Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+//                        getPackageName() + "/" + getPackageName() + ".service.AutoClickService");
+//                Settings.Secure.putInt(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+//                Log.d("system", "SETTING ACCESSIBILITY SUCCESS!");
+//            }
+//        }
+//    }
 }
