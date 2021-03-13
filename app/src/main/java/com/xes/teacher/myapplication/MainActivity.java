@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * @deprecated
+     * 参考地址：https://blog.csdn.net/fromVillageCoolBoy/article/details/111192265
      * 初始化无障碍
      *
      * 系统使用系统权限，或者放到 system/app 目录下
