@@ -1,5 +1,6 @@
 package com.xes.teacher.myapplication;
 
+import android.Manifest;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.ComponentName;
 import android.content.Context;
@@ -76,7 +77,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        PermissionUtils.permission("android.permission.READ_PHONE_STATE", "android.permission.WRITE_SECURE_SETTINGS");
+
+
+
+        PermissionUtils.permission(
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.WRITE_SECURE_SETTINGS,
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ).request();
 
     }
 
