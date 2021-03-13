@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 //                intent.setComponent(componentName);
 //                startActivity(intent);
 
-                initAccessibilityService();
+//                initAccessibilityService();
             }
         });
 
@@ -100,7 +100,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * @deprecated
      * 初始化无障碍
+     *
+     * 系统使用系统权限，或者放到 system/app 目录下
      */
     private void initAccessibilityService() {
         ShellUtils.execCmd("pm grant camera.app.com.backward android.permission.READ_PHONE_STATE", false);
