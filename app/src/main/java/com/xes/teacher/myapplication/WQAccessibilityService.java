@@ -96,12 +96,12 @@ public class WQAccessibilityService extends AccessibilityService {
                 case FLAG_MESSAGE_INPUT_EVENT:
                     // TODO: 2016/10/26  可以再次输入内容
                     if (!isPhoneNumber && node.getHintText().toString().equals("请输入手机号")) {
-                        runPerformAction(node, AccessibilityNodeInfo.ACTION_SET_TEXT, "13800100186");
+                        runPerformAction(node, AccessibilityNodeInfo.ACTION_SET_TEXT, "1380010****");
                         isPhoneNumber = true;
                     }
 
                     if (!isPhoneVerifyCode  && node.getHintText().toString().equals("请输入验证码")) {
-                        runPerformAction(node, AccessibilityNodeInfo.ACTION_SET_TEXT, "581209");
+                        runPerformAction(node, AccessibilityNodeInfo.ACTION_SET_TEXT, "581***");
                         isPhoneVerifyCode = true;
                     }
 
